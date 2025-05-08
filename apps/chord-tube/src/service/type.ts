@@ -2,15 +2,15 @@ export type Thumbnail = {
   url: string;
   width: number;
   height: number;
-}
+};
 
 export type Snippet = {
-  publishedAt: string | Date
+  publishedAt: string | Date;
   channelId: string;
   title: string;
   description: string;
   thumbnails: {
-    "default": Thumbnail;
+    default: Thumbnail;
     medium: Thumbnail;
     high: Thumbnail;
     standard: Thumbnail;
@@ -19,9 +19,9 @@ export type Snippet = {
   channelTitle: string;
   tags: string[];
   categoryId: number;
-  localized: { title: string, description: string };
+  localized: { title: string; description: string };
   defaultAudioLanguage: string;
-}
+};
 
 export type ContentDetails = any;
 
@@ -34,10 +34,15 @@ export type VideoListItem = {
   snippet: Snippet;
   contentDetails: ContentDetails;
   statistics: Statistics;
-}
+};
 
 export type VideoListResponse = {
   kind: string;
   etag: string;
-  items: VideoListItem[]
-}
+  items: VideoListItem[];
+};
+
+export type SidebarItem = {
+  label: string;
+  icon: React.ReactNode;
+};

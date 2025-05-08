@@ -3,23 +3,22 @@ import config from "../config";
 import type { VideoListResponse } from "./type";
 
 type VideoListRequestParams = {
-  chart: 
-    | "mostPopular";
+  chart: "mostPopular";
   part: ("snippet" | "contentDetails" | "statistics")[];
   maxResults: number;
   regionCode: string;
   videoCategoryId: number | string;
   key: string | null;
-}
+};
 
 class PathParamsBuilder {
   private _params: VideoListRequestParams = {
     chart: "mostPopular",
     part: ["snippet", "contentDetails", "statistics"],
-    maxResults: 10,
+    maxResults: 20,
     regionCode: "GB",
     videoCategoryId: 0,
-    key: null
+    key: null,
   };
 
   part(part: VideoListRequestParams["part"]) {
@@ -49,21 +48,21 @@ class PathParamsBuilder {
 
   key(value: string) {
     this._params.key = value;
-    return this
+    return this;
   }
 
   build(baseUrl: string) {
     const url = new URL(baseUrl);
 
-    Object.keys(this._params).forEach(k => {
+    Object.keys(this._params).forEach((k) => {
       const _value = this._params[k as keyof typeof this._params];
 
       const value = Array.isArray(_value)
         ? _value.join(",")
         : _value?.toString();
 
-      if (value) url.searchParams.set(k, value)
-    })
+      if (value) url.searchParams.set(k, value);
+    });
 
     return url.toString();
   }
@@ -73,9 +72,10 @@ export const pathParamsBuilder = new PathParamsBuilder();
 
 export async function getTrendingVideos(): Promise<VideoListResponse> {
   const query = pathParamsBuilder
+    // .videoCategoryId("10")
     .key(config.key)
     .build(config.listUrl);
 
   const { data } = await axios.get(query);
-  return data
+  return data;
 }

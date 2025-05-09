@@ -20,7 +20,8 @@ import MemoryIcon from '@mui/icons-material/Memory';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import RssFeedIcon from '@mui/icons-material/RssFeed';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
-import type { SidebarItem } from '../service/type';
+import { useCategoryIdStore } from '../stores/useVideoStore'; // ✅ Import Zustand store
+
 
 const menu = [
     { id: 1, name: 'Home', categoryID: 0, icon: <HomeOutlinedIcon /> },
@@ -34,28 +35,31 @@ const menu = [
     { id: 9, name: 'News', categoryID: 25, icon: <NewspaperIcon /> }
 ];
 
-
 export default function Sidebar() {
     const [open, setOpen] = useState(false);
+    const setCategoryId = useCategoryIdStore((state) => state.setCategoryId); // ✅ Zustand setter
 
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpen(newOpen);
     };
 
-    const renderList = (items: SidebarItem[]) => (
+    const handleSelect = (categoryID: number) => {
+        setCategoryId(categoryID); 
+        setOpen(false);           
+    };
+
+    const renderList = () => (
         <List>
-            {items.map((item, index) => (
-                <ListItem key={`${item.label}-${index}`} disablePadding>
-                    <ListItemButton>
+            {menu.map((item) => (
+                <ListItem key={item.id} disablePadding>
+                    <ListItemButton onClick={() => handleSelect(item.categoryID)}>
                         <ListItemIcon className='!text-white'>{item.icon}</ListItemIcon>
-                        <ListItemText primary={item.label} />
+                        <ListItemText primary={item.name} />
                     </ListItemButton>
                 </ListItem>
             ))}
         </List>
     );
-
-    const topItems: SidebarItem[] = menu.map(({ name, icon }) => ({ label: name, icon }));
 
     return (
         <div>
@@ -69,7 +73,7 @@ export default function Sidebar() {
                     role="presentation"
                     onClick={toggleDrawer(false)}
                 >
-                    {renderList(topItems)}
+                    {renderList()}
                 </Box>
             </Drawer>
         </div>

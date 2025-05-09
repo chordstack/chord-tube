@@ -1,7 +1,7 @@
 import axios from "axios";
 import config from "../config";
 import type { VideoListResponse } from "./type";
-
+import { useCategoryIdStore } from "../stores/useVideoStore";
 type VideoListRequestParams = {
   chart: "mostPopular";
   part: ("snippet" | "contentDetails" | "statistics")[];
@@ -70,9 +70,9 @@ class PathParamsBuilder {
 
 export const pathParamsBuilder = new PathParamsBuilder();
 
-export async function getTrendingVideos(): Promise<VideoListResponse> {
+export async function getTrendingVideos(categoryId: number): Promise<VideoListResponse> {
   const query = pathParamsBuilder
-    // .videoCategoryId("10")
+    .videoCategoryId(categoryId)
     .key(config.key)
     .build(config.listUrl);
 

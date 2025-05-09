@@ -1,50 +1,35 @@
+import * as React from 'react';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { useState } from 'react';
+import { useCategoryIdStore } from '../stores/useVideoStore';
 
 export default function NavBarbuttonGroup() {
-    const [alignment, setAlignment] = useState<string | null>('left');
+  const categoryId = useCategoryIdStore((state) => state.categoryId);
+  const setCategoryId = useCategoryIdStore((state) => state.setCategoryId);
 
-    const handleAlignment = (
-        event: React.MouseEvent<HTMLElement>,
-        newAlignment: string | null,
-    ) => {
-        if (newAlignment !== null) {
-            setAlignment(newAlignment);
-        }
-    };
+  const [alignment, setAlignment] = React.useState<string>(String(categoryId || 0));
 
-    const baseStyles = `!text-sm !font-medium !py-1 !border !border-gray-100 px-4`;
+  const handleChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newAlignment: string,
+  ) => {
+    if (newAlignment) {
+      setAlignment(newAlignment); 
+      setCategoryId(Number(newAlignment)); 
+    }
+  };
 
-    return (
-        <ToggleButtonGroup
-            sx={{ gap: 2 }}
-            value={alignment}
-            exclusive
-            onChange={handleAlignment}
-            aria-label="text alignment"
-        >
-            <ToggleButton
-                value="left"
-                aria-label="left aligned"
-                className={`${baseStyles} ${alignment === 'left' ? '!bg-gray-100 !text-black' : '!text-white'}`}
-            >
-                Top Lists
-            </ToggleButton>
-            <ToggleButton
-                value="center"
-                aria-label="centered"
-                className={`${baseStyles} ${alignment === 'center' ? '!bg-gray-100 !text-black' : '!text-white'}`}
-            >
-                Music
-            </ToggleButton>
-            <ToggleButton
-                value="right"
-                aria-label="right aligned"
-                className={`${baseStyles} ${alignment === 'right' ? '!bg-gray-100 !text-black' : '!text-white'}`}
-            >
-                Blog
-            </ToggleButton>
-        </ToggleButtonGroup>
-    );
+  return (
+    <ToggleButtonGroup
+      color="primary"
+      value={alignment} 
+      exclusive
+      onChange={handleChange} 
+      aria-label="Category"
+    >
+      <ToggleButton className='!text-white' value="0">Top Lists</ToggleButton>
+      <ToggleButton className='!text-white' value="7">Music</ToggleButton>
+      <ToggleButton className='!text-white' value="8">Blog</ToggleButton>
+    </ToggleButtonGroup>
+  );
 }

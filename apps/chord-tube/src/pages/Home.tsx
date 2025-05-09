@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react"
 import { getTrendingVideos } from "../service"
 import type { VideoListResponse } from "../service/type"
+import { useCategoryIdStore } from "../stores/useVideoStore"
 
 const Home = () => {
     const [videos, setVideos] = useState<VideoListResponse["items"]>([])
+    const categoryId = useCategoryIdStore((state) => state.categoryId);
+
 
     useEffect(() => {
-        getTrendingVideos()
-            .then(data => setVideos(data.items))
-    }, [])
-    console.log(videos)
+      getTrendingVideos(categoryId)
+        .then(data => setVideos(data.items));
+    }, [categoryId]);
+ 
+    console.log('Current Category ID:', useCategoryIdStore.getState().categoryId);
+
 
     return (
         <>

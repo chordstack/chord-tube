@@ -1,13 +1,13 @@
 import axios from "axios";
 import config from "../config";
 import type { VideoListResponse } from "./type";
-import { useCategoryIdStore } from "../stores/useVideoStore";
 type VideoListRequestParams = {
   chart: "mostPopular";
   part: ("snippet" | "contentDetails" | "statistics")[];
   maxResults: number;
   regionCode: string;
   videoCategoryId: number | string;
+  q: string;
   key: string | null;
 };
 
@@ -15,7 +15,7 @@ class PathParamsBuilder {
   private _params: VideoListRequestParams = {
     chart: "mostPopular",
     part: ["snippet", "contentDetails", "statistics"],
-    maxResults: 20,
+    maxResults: 100,
     regionCode: "GB",
     videoCategoryId: 0,
     key: null,
@@ -38,6 +38,11 @@ class PathParamsBuilder {
 
   regionCode(value: VideoListRequestParams["regionCode"]) {
     this._params.regionCode = value;
+    return this;
+  }
+
+  q(value: VideoListRequestParams["q"]) {
+    this._params.q = value;
     return this;
   }
 
@@ -70,11 +75,22 @@ class PathParamsBuilder {
 
 export const pathParamsBuilder = new PathParamsBuilder();
 
-export async function getTrendingVideos(categoryId: number): Promise<VideoListResponse> {
+export async function getTrendingVideos(
+  categoryId: number,
+  regionCode: string
+): Promise<VideoListResponse> {
   const query = pathParamsBuilder
     .videoCategoryId(categoryId)
+    .regionCode(regionCode)
     .key(config.key)
     .build(config.listUrl);
+
+  const { data } = await axios.get(query);
+  return data;
+}
+
+export async function getSearchVideos(q: string): Promise<VideoListResponse> {
+  const query = pathParamsBuilder.key(config.key).q(q).build(config.searchUrl);
 
   const { data } = await axios.get(query);
   return data;

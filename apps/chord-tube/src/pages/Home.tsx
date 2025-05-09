@@ -1,37 +1,67 @@
-import { useEffect, useState } from "react"
-import { getTrendingVideos } from "../service"
-import type { VideoListResponse } from "../service/type"
-import { useCategoryIdStore } from "../stores/useVideoStore"
+import { useEffect, useState } from "react";
+import { getTrendingVideos } from "../service";
+import type { VideoListResponse } from "../service/type";
+import { useCategoryIdStore, useRegionCodeStore, useSearchStore } from "../stores/useVideoStore";
+import ColumnSwitcher from "../components/colsSwitcher";
+import RegionButtonGroup from "../components/RegionButtonGroup";
+import Card from "../components/card";
+import noData from "../assets/images/nodata.webp"
 
 const Home = () => {
-    const [videos, setVideos] = useState<VideoListResponse["items"]>([])
+    const [videos, setVideos] = useState<VideoListResponse["items"]>([]);
+    const [cols, setCols] = useState(3);
     const categoryId = useCategoryIdStore((state) => state.categoryId);
+    const regionCode = useRegionCodeStore((state) => state.regionCode);
+    const query = useSearchStore((state) => state.query);
+
 
 
     useEffect(() => {
-      getTrendingVideos(categoryId)
-        .then(data => setVideos(data.items));
-    }, [categoryId]);
- 
-    console.log('Current Category ID:', useCategoryIdStore.getState().categoryId);
+        getTrendingVideos(categoryId, regionCode)
+            .then(data => setVideos(data.items));
+    }, [categoryId, regionCode]);
+
+    // console.log(query);
+
+    const getGridCols = () => {
+        switch (cols) {
+            case 1:
+                return "grid-cols-1";
+            case 2:
+                return "grid-cols-2";
+            case 3:
+                return "grid-cols-3";
+            case 4:
+                return "grid-cols-4";
+            case 5:
+                return "grid-cols-5";
+            default:
+                return "grid-cols-5";
+        }
+    };
+
+
 
 
     return (
         <>
-            <div className="grid lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-6 mt-5">
-                {videos.map((video, idx) => (
-                    <figure className=" cursor-pointer hover:opacity-80 transition-all" key={idx}>
-                        <img
-                            className="object-cover object-center aspect-video"
-                            src={video.snippet.thumbnails.standard.url}
-                            alt=""
-                        />
-                    </figure>
-                ))}
+            <div className="flex gap-5 justify-between md:items-center items-start">
+                <RegionButtonGroup />
+                <ColumnSwitcher onChange={(cols) => setCols(cols)} />
             </div>
+            {videos.length > 0 ? (
+                <div className={`grid ${getGridCols()} md:gap-x-4 md:gap-y-6 gap-x-3 gap-y-5 mt-5 w-full`}>
+                    {videos.map((video, idx) => (
+                        <Card key={idx} idx={idx} video={video} />
+                    ))}
+                </div>
+            ) : (
+                <figure className="w-full flex justify-center  items-center">
+                    <img src={noData} className=" max-w-[40%] " alt="No results" />
+                </figure>
+            )}
         </>
-    )
+    );
+};
 
-}
-
-export default Home
+export default Home;

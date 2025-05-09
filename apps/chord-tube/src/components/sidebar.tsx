@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     Box,
     Drawer,
     Button,
     List,
-    Divider,
     ListItem,
     ListItemButton,
     ListItemIcon,
@@ -20,7 +19,8 @@ import MemoryIcon from '@mui/icons-material/Memory';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import RssFeedIcon from '@mui/icons-material/RssFeed';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
-import { useCategoryIdStore } from '../stores/useVideoStore'; // ✅ Import Zustand store
+import { useCategoryIdStore } from '../stores/useVideoStore';
+import logo from '../assets/images/logo.webp';
 
 
 const menu = [
@@ -37,39 +37,49 @@ const menu = [
 
 export default function Sidebar() {
     const [open, setOpen] = useState(false);
-    const setCategoryId = useCategoryIdStore((state) => state.setCategoryId); // ✅ Zustand setter
+    const setCategoryId = useCategoryIdStore((state) => state.setCategoryId);
+    const categoryId = useCategoryIdStore((state) => state.categoryId);
 
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpen(newOpen);
     };
 
     const handleSelect = (categoryID: number) => {
-        setCategoryId(categoryID); 
-        setOpen(false);           
+        setCategoryId(categoryID);
+        setOpen(false);
     };
 
     const renderList = () => (
         <List>
+            <div className=" flex items-center">
+                <Button onClick={toggleDrawer(true)} className='!w-[20px]' variant="text">
+                    <MenuIcon />
+                </Button>
+                <Button onClick={() => window.location.href = "/"} variant="text" className=" md:w-[130px] w-[120px] hover:!bg-transparent hover:scale-[102%] !transition-all  ">
+                    <img src={logo} alt="" />
+                </Button>
+            </div>
             {menu.map((item) => (
                 <ListItem key={item.id} disablePadding>
-                    <ListItemButton onClick={() => handleSelect(item.categoryID)}>
+                    <ListItemButton className={`${categoryId === item.categoryID && '!bg-gray-800'}`} onClick={() => handleSelect(item.categoryID)}>
                         <ListItemIcon className='!text-white'>{item.icon}</ListItemIcon>
                         <ListItemText primary={item.name} />
                     </ListItemButton>
                 </ListItem>
-            ))}
-        </List>
+            ))
+            }
+        </List >
     );
 
     return (
         <div>
-            <Button onClick={toggleDrawer(true)} variant="text">
+            <Button onClick={toggleDrawer(true)} className='!w-[20px]' variant="text">
                 <MenuIcon />
             </Button>
-            <Drawer open={open} onClose={toggleDrawer(false)}>
+            <Drawer open={open} className='bg-[rgba(0,0,0,0.3)]' onClose={toggleDrawer(false)}>
                 <Box
                     sx={{ width: 250 }}
-                    className="bg-gray-900 text-white h-full"
+                    className="bg-gray-950 text-white h-full"
                     role="presentation"
                     onClick={toggleDrawer(false)}
                 >

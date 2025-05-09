@@ -46,3 +46,29 @@ export type SidebarItem = {
   label: string;
   icon: React.ReactNode;
 };
+
+export type CategoryIdStore = {
+  categoryId: number;
+  setCategoryId: (id: number) => void;
+};
+
+export type RegionCodeStore = {
+  regionCode: string;
+  setRegionCode: (code: string) => void;
+};
+export type SearchState = {
+  input: string;
+  query: string;
+  setInput: (value: string) => void;
+  submitQuery: () => void;
+};
+
+export type flagPage = {
+  flag: boolean;
+  setFlag: (flag: boolean) => void;
+};
+
+export type CardProps = {
+  video: VideoListItem;
+  idx: number;
+};

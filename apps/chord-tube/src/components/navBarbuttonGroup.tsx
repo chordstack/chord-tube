@@ -7,29 +7,38 @@ export default function NavBarbuttonGroup() {
   const categoryId = useCategoryIdStore((state) => state.categoryId);
   const setCategoryId = useCategoryIdStore((state) => state.setCategoryId);
 
-  const [alignment, setAlignment] = React.useState<string>(String(categoryId || 0));
-
   const handleChange = (
     event: React.MouseEvent<HTMLElement>,
-    newAlignment: string,
+    newCategoryId: string,
   ) => {
-    if (newAlignment) {
-      setAlignment(newAlignment); 
-      setCategoryId(Number(newAlignment)); 
+    if (newCategoryId !== null) {
+      setCategoryId(Number(newCategoryId));
     }
   };
+
+  const buttons = [
+    { label: 'Top Lists', value: '0' },
+    { label: 'Music', value: '10' },
+    { label: 'Blog', value: '22' },
+  ];
 
   return (
     <ToggleButtonGroup
       color="primary"
-      value={alignment} 
+      value={String(categoryId)}
       exclusive
-      onChange={handleChange} 
+      onChange={handleChange}
       aria-label="Category"
     >
-      <ToggleButton className='!text-white' value="0">Top Lists</ToggleButton>
-      <ToggleButton className='!text-white' value="7">Music</ToggleButton>
-      <ToggleButton className='!text-white' value="8">Blog</ToggleButton>
+      {buttons.map(({ label, value }) => (
+        <ToggleButton
+          key={value}
+          value={value}
+          className={`!text-white ${String(categoryId) === value ? 'bg-gray-700' : ''}`}
+        >
+          {label}
+        </ToggleButton>
+      ))}
     </ToggleButtonGroup>
   );
 }

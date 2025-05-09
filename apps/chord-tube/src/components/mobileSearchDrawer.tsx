@@ -38,9 +38,8 @@ export default function MobileSearchDrawer() {
                             }
                         }}
                     >
-
                         <Box sx={{ mt: 1, width: "100%" }}>
-                            <SearchInput />
+                            <SearchInput onSubmit={() => setOpen(false)} />
                         </Box>
                     </Drawer>
                 </>

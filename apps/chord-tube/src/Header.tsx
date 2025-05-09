@@ -4,22 +4,25 @@ import logo from "./assets/images/logo.webp"
 import SearchInput from "./components/searchInput";
 import MobileSearchDrawer from "./components/mobileSearchDrawer";
 import NavBarbuttonGroup from "./components/navBarbuttonGroup";
+import { Button } from "@mui/material";
 
 
 
 
 
 const Header = () => {
+
+
     return (
         <header className="">
-            <nav className="  flex justify-between items-center ">
+            <nav className=" flex justify-between items-center ">
                 <div className=" flex items-center">
                     <div className=" lg:flex hidden">
                         <Sidebar />
                     </div>
-                    <figure className=" md:w-[150px] w-[120px]">
+                    <Button onClick={() => window.location.href = "/"} variant="text" className=" md:w-[130px] w-[120px] hover:!bg-transparent hover:scale-[102%] !transition-all  ">
                         <img src={logo} alt="" />
-                    </figure>
+                    </Button>
                 </div>
                 <div className=" lg:flex w-full max-w-[500px] hidden">
                     <SearchInput />
@@ -33,7 +36,7 @@ const Header = () => {
                     <NavBarbuttonGroup />
                 </div>
             </nav>
-        </header >
+        </header>
 
     )
 }

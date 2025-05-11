@@ -20,7 +20,7 @@ export default function Card({ video, idx }: CardProps) {
             </p>
             <div className="  flex justify-between text-xs text-gray-300">
                 <p className=" flex items-center ">
-                    {viewConverter(video.statistics.viewCount)} views{" "}
+                    {viewConverter(video?.statistics?.viewCount)} views{" "}
                 </p>
                 <p>{formattedDate}</p>
             </div>

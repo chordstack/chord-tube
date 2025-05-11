@@ -1,18 +1,21 @@
 import axios from "axios";
 import config from "../config";
 import type { VideoListResponse } from "./type";
-type VideoListRequestParams = {
+
+/**
+ * Trending Videos Request Builder
+ */
+type TrendingVideoParams = {
   chart: "mostPopular";
   part: ("snippet" | "contentDetails" | "statistics")[];
   maxResults: number;
   regionCode: string;
   videoCategoryId: number | string;
-  q: string;
   key: string | null;
 };
 
-class PathParamsBuilder {
-  private _params: VideoListRequestParams = {
+class TrendingParamsBuilder {
+  private _params: TrendingVideoParams = {
     chart: "mostPopular",
     part: ["snippet", "contentDetails", "statistics"],
     maxResults: 100,
@@ -21,32 +24,27 @@ class PathParamsBuilder {
     key: null,
   };
 
-  part(part: VideoListRequestParams["part"]) {
-    this._params.part = part;
-    return this;
-  }
-
-  chart(value: VideoListRequestParams["chart"]) {
+  chart(value: TrendingVideoParams["chart"]) {
     this._params.chart = value;
     return this;
   }
 
-  maxResults(value: VideoListRequestParams["maxResults"]) {
+  part(part: TrendingVideoParams["part"]) {
+    this._params.part = part;
+    return this;
+  }
+
+  maxResults(value: number) {
     this._params.maxResults = value;
     return this;
   }
 
-  regionCode(value: VideoListRequestParams["regionCode"]) {
+  regionCode(value: string) {
     this._params.regionCode = value;
     return this;
   }
 
-  q(value: VideoListRequestParams["q"]) {
-    this._params.q = value;
-    return this;
-  }
-
-  videoCategoryId(value: VideoListRequestParams["videoCategoryId"]) {
+  videoCategoryId(value: number | string) {
     this._params.videoCategoryId = value;
     return this;
   }
@@ -58,40 +56,87 @@ class PathParamsBuilder {
 
   build(baseUrl: string) {
     const url = new URL(baseUrl);
-
-    Object.keys(this._params).forEach((k) => {
-      const _value = this._params[k as keyof typeof this._params];
-
-      const value = Array.isArray(_value)
-        ? _value.join(",")
-        : _value?.toString();
-
-      if (value) url.searchParams.set(k, value);
+    Object.entries(this._params).forEach(([k, v]) => {
+      if (Array.isArray(v)) {
+        url.searchParams.set(k, v.join(","));
+      } else if (v !== null && v !== undefined && v !== "") {
+        url.searchParams.set(k, String(v));
+      }
     });
-
     return url.toString();
   }
 }
 
-export const pathParamsBuilder = new PathParamsBuilder();
+/**
+ * Search Videos Request Builder
+ */
+type SearchVideoParams = {
+  part: "snippet";
+  maxResults: number;
+  q: string;
+  key: string | null;
+};
 
+class SearchParamsBuilder {
+  private _params: SearchVideoParams = {
+    part: "snippet",
+    maxResults: 100,
+    q: "",
+    key: null,
+  };
+
+  part(part: "snippet") {
+    this._params.part = part;
+    return this;
+  }
+
+  maxResults(value: number) {
+    this._params.maxResults = value;
+    return this;
+  }
+
+  q(value: string) {
+    this._params.q = value;
+    return this;
+  }
+
+  key(value: string) {
+    this._params.key = value;
+    return this;
+  }
+
+  build(baseUrl: string) {
+    const url = new URL(baseUrl);
+    Object.entries(this._params).forEach(([k, v]) => {
+      if (v !== null && v !== undefined && v !== "") {
+        url.searchParams.set(k, String(v));
+      }
+    });
+    return url.toString();
+  }
+}
+
+// 🟢 Export functions
 export async function getTrendingVideos(
   categoryId: number,
   regionCode: string
 ): Promise<VideoListResponse> {
-  const query = pathParamsBuilder
+  const url = new TrendingParamsBuilder()
     .videoCategoryId(categoryId)
     .regionCode(regionCode)
     .key(config.key)
     .build(config.listUrl);
 
-  const { data } = await axios.get(query);
+  const { data } = await axios.get(url);
   return data;
 }
 
 export async function getSearchVideos(q: string): Promise<VideoListResponse> {
-  const query = pathParamsBuilder.key(config.key).q(q).build(config.searchUrl);
+  const url = new SearchParamsBuilder()
+    .q(q)
+    .key(config.key)
+    .build(config.searchUrl);
 
-  const { data } = await axios.get(query);
+  const { data } = await axios.get(url);
   return data;
 }

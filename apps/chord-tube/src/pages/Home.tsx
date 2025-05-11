@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { getTrendingVideos } from "../service";
+import { use, useEffect, useState } from "react";
+import { getSearchVideos, getTrendingVideos } from "../service";
 import type { VideoListResponse } from "../service/type";
 import { useCategoryIdStore, useRegionCodeStore, useSearchStore } from "../stores/useVideoStore";
 import ColumnSwitcher from "../components/colsSwitcher";
@@ -12,16 +12,20 @@ const Home = () => {
     const [cols, setCols] = useState(3);
     const categoryId = useCategoryIdStore((state) => state.categoryId);
     const regionCode = useRegionCodeStore((state) => state.regionCode);
-    const query = useSearchStore((state) => state.query);
-
+    const q = useSearchStore((state) => state.query);
 
 
     useEffect(() => {
-        getTrendingVideos(categoryId, regionCode)
+        if (q.length === 0) {
+              getTrendingVideos(categoryId, regionCode)
             .then(data => setVideos(data.items));
-    }, [categoryId, regionCode]);
-
-    // console.log(query);
+        } else {
+            getSearchVideos(q)
+                .then(data => setVideos(data.items));
+        }
+    }, [q,categoryId, regionCode]);
+console.log(q);
+    console.log(videos);
 
     const getGridCols = () => {
         switch (cols) {

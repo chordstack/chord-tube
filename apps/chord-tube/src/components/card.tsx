@@ -13,14 +13,10 @@ export default function Card({ video, idx }: CardProps) {
                 className="object-cover caret-transparent object-center aspect-video group-hover:opacity-70 transition-all"
                 src={video.snippet.thumbnails.high.url}
             />
-            <div></div>
             <h1 className=" line-clamp-2 md:text-lg font-medium leading-tight">{video.snippet.title}</h1>
-            <p className=" font-medium sm:text-sm text-gray-200 ">
-                {video.snippet.channelTitle}
-            </p>
             <div className="  flex justify-between text-xs text-gray-300">
-                <p className=" flex items-center ">
-                    {viewConverter(video?.statistics?.viewCount)} views{" "}
+                <p className=" font-medium md:text-md text-sm text-gray-200 ">
+                    {video.snippet.channelTitle}
                 </p>
                 <p>{formattedDate}</p>
             </div>

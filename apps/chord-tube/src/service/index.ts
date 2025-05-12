@@ -71,7 +71,7 @@ class TrendingParamsBuilder {
  * Search Videos Request Builder
  */
 type SearchVideoParams = {
-  part: "snippet";
+  part: string;
   maxResults: number;
   q: string;
   key: string | null;
@@ -80,7 +80,7 @@ type SearchVideoParams = {
 class SearchParamsBuilder {
   private _params: SearchVideoParams = {
     part: "snippet",
-    maxResults: 100,
+    maxResults: 25,
     q: "",
     key: null,
   };

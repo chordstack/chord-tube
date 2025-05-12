@@ -17,14 +17,14 @@ const Home = () => {
 
     useEffect(() => {
         if (q.length === 0) {
-              getTrendingVideos(categoryId, regionCode)
-            .then(data => setVideos(data.items));
+            getTrendingVideos(categoryId, regionCode)
+                .then(data => setVideos(data.items));
         } else {
             getSearchVideos(q)
                 .then(data => setVideos(data.items));
         }
-    }, [q,categoryId, regionCode]);
-console.log(q);
+    }, [q, categoryId, regionCode]);
+    console.log(q);
     console.log(videos);
 
     const getGridCols = () => {

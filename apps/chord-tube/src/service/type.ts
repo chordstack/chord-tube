@@ -30,7 +30,7 @@ export type Statistics = any;
 export type VideoListItem = {
   kind: string;
   etag: string;
-  id: string;
+  id: string | { videoId: string };
   snippet: Snippet;
   contentDetails: ContentDetails;
   statistics: Statistics;

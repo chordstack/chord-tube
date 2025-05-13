@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { CalendarViewWeekSharp, GridOnSharp, ViewCozyOutlined, ViewStreamOutlined, ViewWeekOutlined } from "@mui/icons-material";
+import { Button } from "@mui/material";
 
 interface Props {
     onChange: (cols: number) => void;
@@ -54,18 +55,18 @@ const ColumnSwitcher = ({ onChange }: Props) => {
     }, [screen]);
 
     return (
-        <div className="flex justify-end gap-2 mt-4">
+        <div className="flex justify-end mt-4">
             {getOptions(screen).map((col) => (
-                <button
+                <Button
                     key={col}
                     onClick={() => {
                         setSelected(col);
                         onChange(col);
                     }}
-                    className={`lg:p-4 md:p-3 p-2 rounded ${selected === col && "bg-gray-800 text-white"}`}
+                    className={`lg:p-4 md:p-3 p-2 rounded ${selected === col && "!bg-gray-800 !rounded-none text-white"}`}
                 >
                     {getIcons(col)}
-                </button>
+                </Button>
             ))}
         </div>
     );

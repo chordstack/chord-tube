@@ -21,6 +21,8 @@ import RssFeedIcon from '@mui/icons-material/RssFeed';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import { useCategoryIdStore } from '../stores/useVideoStore';
 import logo from '../assets/images/logo.webp';
+import { categoryMap } from '../constants/categoryMap';
+import { useNavigate } from 'react-router-dom';
 
 
 const menu = [
@@ -39,12 +41,15 @@ export default function Sidebar() {
     const [open, setOpen] = useState(false);
     const setCategoryId = useCategoryIdStore((state) => state.setCategoryId);
     const categoryId = useCategoryIdStore((state) => state.categoryId);
+    const name = categoryMap[categoryId];
+    const navigate = useNavigate();
 
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpen(newOpen);
     };
 
     const handleSelect = (categoryID: number) => {
+        navigate(`/${name}`);
         setCategoryId(categoryID);
         setOpen(false);
     };

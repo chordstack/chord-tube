@@ -6,6 +6,8 @@ import ColumnSwitcher from "../components/colsSwitcher";
 import RegionButtonGroup from "../components/RegionButtonGroup";
 import Card from "../components/card";
 import noData from "../assets/images/nodata.webp"
+import { useNavigate } from "react-router-dom";
+import { categoryMap } from "../constants/categoryMap";
 
 const Home = () => {
     const [videos, setVideos] = useState<VideoListResponse["items"]>([]);
@@ -14,9 +16,13 @@ const Home = () => {
     const regionCode = useRegionCodeStore((state) => state.regionCode);
     const q = useSearchStore((state) => state.query);
 
+    const navigate = useNavigate();
+
+    const name = categoryMap[categoryId];
 
     useEffect(() => {
         if (q.length === 0) {
+            navigate(`/${name}`);
             getTrendingVideos(categoryId, regionCode)
                 .then(data => setVideos(data.items));
         } else {
@@ -24,8 +30,7 @@ const Home = () => {
                 .then(data => setVideos(data.items));
         }
     }, [q, categoryId, regionCode]);
-    console.log(q);
-    console.log(videos);
+
 
     const getGridCols = () => {
         switch (cols) {

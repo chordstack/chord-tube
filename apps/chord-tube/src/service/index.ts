@@ -29,8 +29,8 @@ class TrendingParamsBuilder {
     return this;
   }
 
-  part(part: TrendingVideoParams["part"]) {
-    this._params.part = part;
+  part(value: TrendingVideoParams["part"]) {
+    this._params.part = value;
     return this;
   }
 
@@ -80,13 +80,13 @@ type SearchVideoParams = {
 class SearchParamsBuilder {
   private _params: SearchVideoParams = {
     part: "snippet",
-    maxResults: 25,
+    maxResults: 100,
     q: "",
     key: null,
   };
 
-  part(part: "snippet") {
-    this._params.part = part;
+  part(value: "snippet") {
+    this._params.part = value;
     return this;
   }
 
@@ -109,6 +109,50 @@ class SearchParamsBuilder {
     const url = new URL(baseUrl);
     Object.entries(this._params).forEach(([k, v]) => {
       if (v !== null && v !== undefined && v !== "") {
+        url.searchParams.set(k, String(v));
+      }
+    });
+    return url.toString();
+  }
+}
+
+/**
+ * Video Detail Request Builder
+ */
+type VideoDetailParams = {
+  part: ("snippet" | "contentDetails" | "statistics")[];
+  id: string;
+  key: string | null;
+};
+
+class VideoDetailParamsBuilder {
+  private _params: VideoDetailParams = {
+    part: ["snippet", "contentDetails", "statistics"],
+    id: "",
+    key: null,
+  };
+
+  part(value: VideoDetailParams["part"]) {
+    this._params.part = value;
+    return this;
+  }
+
+  id(value: string) {
+    this._params.id = value;
+    return this;
+  }
+
+  key(value: string) {
+    this._params.key = value;
+    return this;
+  }
+
+  build(baseUrl: string) {
+    const url = new URL(baseUrl);
+    Object.entries(this._params).forEach(([k, v]) => {
+      if (Array.isArray(v)) {
+        url.searchParams.set(k, v.join(","));
+      } else if (v !== null && v !== undefined && v !== "") {
         url.searchParams.set(k, String(v));
       }
     });
@@ -140,3 +184,46 @@ export async function getSearchVideos(q: string): Promise<VideoListResponse> {
   const { data } = await axios.get(url);
   return data;
 }
+
+export async function getVideoDetail(id: string): Promise<VideoListResponse> {
+  const url = new VideoDetailParamsBuilder()
+    .id(id)
+    .key(config.key)
+    .build(config.listUrl);
+
+  const { data } = await axios.get(url);
+  return data;
+}
+
+export async function getChannelDetail(id: string): Promise<any> {
+  const url = new URL(config.channelUrl);
+  url.searchParams.set("part", "snippet,statistics");
+  url.searchParams.set("id", id);
+  url.searchParams.set("key", config.key || "");
+
+  const { data } = await axios.get(url.toString());
+  return data;
+}
+
+export const viewConverter = (value: number) => {
+  if (value >= 1000000) {
+    return (value / 1000000).toFixed(1) + "M";
+  } else if (value >= 1000) {
+    return (value / 1000).toFixed(1) + "K";
+  } else {
+    return value;
+  }
+};
+
+export const getVideoComments = async (videoId: string, order: string) => {
+  const { data } = await axios.get(`${config.BASE_URL}/commentThreads`, {
+    params: {
+      part: "snippet",
+      videoId,
+      maxResults: 100,
+      order: order,
+      key: config.key,
+    },
+  });
+  return data.items;
+};

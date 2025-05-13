@@ -13,7 +13,7 @@ export default function SearchInput({ onSubmit }: Props) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         submitQuery();
-        onSubmit?.(); // Call parent handler (e.g. to close drawer)
+        onSubmit?.();
     };
 
     return (

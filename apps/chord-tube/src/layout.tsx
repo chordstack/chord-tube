@@ -11,7 +11,9 @@ export default function Layout({ children }: LayoutProps) {
         <div className="bg-gray-900 text-white">
             <div className="min-h-screen flex flex-col px-[2.5%] mx-auto pb-10">
                 <Header />
-                {children}
+                <div className=" mt-20">
+                    {children}
+                </div>
             </div>
         </div >
     );

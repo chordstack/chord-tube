@@ -2,25 +2,27 @@ import axios from "axios";
 import config from "../config";
 import type { VideoListResponse } from "./type";
 
-/**
- * Trending Videos Request Builder
- */
+/** Enums */
+const defaultParts = ["snippet", "contentDetails", "statistics"] as const;
+type PartType = typeof defaultParts[number];
+
+/** Trending Videos Request Builder */
 type TrendingVideoParams = {
   chart: "mostPopular";
-  part: ("snippet" | "contentDetails" | "statistics")[];
+  part: PartType[];
   maxResults: number;
   regionCode: string;
-  videoCategoryId: number | string;
+  videoCategoryId?: number | string;
   key: string | null;
+  pageToken?: string | null;
 };
 
 class TrendingParamsBuilder {
   private _params: TrendingVideoParams = {
     chart: "mostPopular",
-    part: ["snippet", "contentDetails", "statistics"],
+    part: [...defaultParts],
     maxResults: 100,
     regionCode: "GB",
-    videoCategoryId: 0,
     key: null,
   };
 
@@ -29,7 +31,7 @@ class TrendingParamsBuilder {
     return this;
   }
 
-  part(value: TrendingVideoParams["part"]) {
+  part(value: PartType[]) {
     this._params.part = value;
     return this;
   }
@@ -45,12 +47,19 @@ class TrendingParamsBuilder {
   }
 
   videoCategoryId(value: number | string) {
-    this._params.videoCategoryId = value;
+    if (value !== 0) {
+      this._params.videoCategoryId = value;
+    }
     return this;
   }
 
   key(value: string) {
     this._params.key = value;
+    return this;
+  }
+
+  pageToken(value?: string) {
+    if (value) this._params.pageToken = value;
     return this;
   }
 
@@ -67,14 +76,13 @@ class TrendingParamsBuilder {
   }
 }
 
-/**
- * Search Videos Request Builder
- */
+/** Search Videos Builder */
 type SearchVideoParams = {
-  part: string;
+  part: "snippet";
   maxResults: number;
   q: string;
   key: string | null;
+  pageToken?: string | null;
 };
 
 class SearchParamsBuilder {
@@ -83,6 +91,7 @@ class SearchParamsBuilder {
     maxResults: 100,
     q: "",
     key: null,
+    pageToken: null,
   };
 
   part(value: "snippet") {
@@ -105,6 +114,11 @@ class SearchParamsBuilder {
     return this;
   }
 
+  pageToken(value: string | null) {
+    this._params.pageToken = value;
+    return this;
+  }
+
   build(baseUrl: string) {
     const url = new URL(baseUrl);
     Object.entries(this._params).forEach(([k, v]) => {
@@ -116,23 +130,21 @@ class SearchParamsBuilder {
   }
 }
 
-/**
- * Video Detail Request Builder
- */
+/** Video Detail Builder */
 type VideoDetailParams = {
-  part: ("snippet" | "contentDetails" | "statistics")[];
+  part: PartType[];
   id: string;
   key: string | null;
 };
 
 class VideoDetailParamsBuilder {
   private _params: VideoDetailParams = {
-    part: ["snippet", "contentDetails", "statistics"],
+    part: [...defaultParts],
     id: "",
     key: null,
   };
 
-  part(value: VideoDetailParams["part"]) {
+  part(value: PartType[]) {
     this._params.part = value;
     return this;
   }
@@ -160,28 +172,34 @@ class VideoDetailParamsBuilder {
   }
 }
 
-// 🟢 Export functions
+// 🟢 API Functions
 export async function getTrendingVideos(
   categoryId: number,
-  regionCode: string
+  regionCode: string,
+  pageToken: string = ""
 ): Promise<VideoListResponse> {
   const url = new TrendingParamsBuilder()
     .videoCategoryId(categoryId)
     .regionCode(regionCode)
+    .pageToken(pageToken)
     .key(config.key)
     .build(config.listUrl);
 
-  const { data } = await axios.get(url);
+  const { data } = await axios.get<VideoListResponse>(url);
   return data;
 }
 
-export async function getSearchVideos(q: string): Promise<VideoListResponse> {
+export async function getSearchVideos(
+  q: string,
+  pageToken: string
+): Promise<VideoListResponse> {
   const url = new SearchParamsBuilder()
     .q(q)
     .key(config.key)
+    .pageToken(pageToken)
     .build(config.searchUrl);
 
-  const { data } = await axios.get(url);
+  const { data } = await axios.get<VideoListResponse>(url);
   return data;
 }
 
@@ -191,7 +209,7 @@ export async function getVideoDetail(id: string): Promise<VideoListResponse> {
     .key(config.key)
     .build(config.listUrl);
 
-  const { data } = await axios.get(url);
+  const { data } = await axios.get<VideoListResponse>(url);
   return data;
 }
 
@@ -206,10 +224,10 @@ export async function getChannelDetail(id: string): Promise<any> {
 }
 
 export const viewConverter = (value: number) => {
-  if (value >= 1000000) {
-    return (value / 1000000).toFixed(1) + "M";
-  } else if (value >= 1000) {
-    return (value / 1000).toFixed(1) + "K";
+  if (value >= 1_000_000) {
+    return (value / 1_000_000).toFixed(1) + "M";
+  } else if (value >= 1_000) {
+    return (value / 1_000).toFixed(1) + "K";
   } else {
     return value;
   }
@@ -221,7 +239,7 @@ export const getVideoComments = async (videoId: string, order: string) => {
       part: "snippet",
       videoId,
       maxResults: 100,
-      order: order,
+      order,
       key: config.key,
     },
   });

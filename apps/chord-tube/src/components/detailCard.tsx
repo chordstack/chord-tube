@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom"
-import { viewConverter } from "../service"
 import { Button, Divider, Fab } from "@mui/material"
 import DescriptionToggle from "./showmoreToggle"
 import SubscribeButton from "./subscribeButton"
 import { GetApp, ThumbDownOffAlt, ThumbUpAlt, TurnedInNot } from "@mui/icons-material"
 import { useSearchStore } from "../stores/useVideoStore"
 import { CommentSection } from "./commentSection"
+import { viewConverter } from "../service"
 
 const DetailCard = ({ video, channel, id }: any) => {
     const setQuery = useSearchStore(state => state.setInput)

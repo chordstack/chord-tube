@@ -7,7 +7,6 @@ import type { VideoListItem } from "../service/type"
 
 export const SuggestedCard = ({ video }: { video: VideoListItem }) => {
     const videoId = typeof video.id === "string" ? video.id : video.id?.videoId;
-
     return (
         <Link to={`/detail/${videoId}`} className="w-full grid grid-cols-2 gap-4 group">
             <figure className=" w-full">

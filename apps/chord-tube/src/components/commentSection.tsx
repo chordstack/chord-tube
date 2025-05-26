@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import type { ContentDetails } from "../service/type";
 import { getVideoComments } from "../service";
+import Avatar from "@mui/material/Avatar";
 
-
-export const CommentSection = ({ video }: ContentDetails) => {
-    const [filter, setFilter] = useState("Top");
-    const [comments, setComments] = useState([]);
+export const CommentSection = ({ video }: { video: ContentDetails }) => {
+    const [filter, setFilter] = useState<"Top" | "Newest">("Top");
+    const [comments, setComments] = useState<any[]>([]);
 
     const fetchComments = async () => {
         if (!video?.id) return;
@@ -22,18 +22,18 @@ export const CommentSection = ({ video }: ContentDetails) => {
         fetchComments();
     }, [video?.id, filter]);
 
-    const isActive = (val: string) =>
+    const isActive = (val: "Top" | "Newest") =>
         filter === val
-            ? "bg-[rgba(255,255,255,0.3)]  font-semibold"
-            : "bg-[rgba(255,255,255,0.1)]  hover:bg-gray-700";
+            ? "bg-[rgba(255,255,255,0.3)] font-semibold"
+            : "bg-[rgba(255,255,255,0.1)] hover:bg-gray-700";
 
     return (
         <section className="mt-5">
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-lg font-semibold">
-                    {video?.statistics.commentCount} comments
+                    {video?.statistics?.commentCount || 0} comments
                 </h1>
-                <div className="flex rounded overflow-hidden ">
+                <div className="flex rounded overflow-hidden">
                     <button
                         onClick={() => setFilter("Top")}
                         className={`px-4 py-1 text-sm transition ${isActive("Top")}`}
@@ -50,25 +50,42 @@ export const CommentSection = ({ video }: ContentDetails) => {
             </div>
 
             <div>
-                <div>
-                    {comments.map((comment: any) => (
+                {comments.map((comment) => {
+                    const snippet = comment?.snippet?.topLevelComment?.snippet;
+
+                    if (!snippet) return null; // Defensive check
+
+                    const imgUrl = snippet.authorProfileImageUrl;
+                    const authorName = snippet.authorDisplayName;
+                    const commentText = snippet.textDisplay;
+
+                    const hasValidImage =
+                        typeof imgUrl === "string" && imgUrl.startsWith("http");
+
+                    return (
                         <div key={comment.id} className="flex gap-4 mb-4 items-start">
-                            <img
-                                src={comment.snippet.topLevelComment.snippet.authorProfileImageUrl}
-                                alt={comment.snippet.topLevelComment.snippet.authorDisplayName}
-                                className="w-10 h-10 mt-1 rounded-full"
-                            />
+                            {hasValidImage ? (
+                                <img
+                                    src={imgUrl}
+                                    alt={authorName}
+                                    className="w-10 h-10 mt-1 rounded-full"
+                                    onError={(e) => {
+                                        e.currentTarget.onerror = null;
+                                        e.currentTarget.src = ""; // fallback to empty or default image
+                                    }}
+                                />
+                            ) : (
+                                <Avatar sx={{ width: 40, height: 40, mt: "4px" }}>
+                                    {authorName?.[0]?.toUpperCase() || "U"}
+                                </Avatar>
+                            )}
                             <div>
-                                <h2 className="font-semibold text">
-                                    {comment.snippet.topLevelComment.snippet.authorDisplayName}
-                                </h2>
-                                <p className="text-sm">{comment.snippet.topLevelComment.snippet.textDisplay}</p>
+                                <a className="font-semibold hover:underline transition-all text-lg cursor-pointer">{authorName}</a>
+                                <p className="text-sm text-gray-50/70" dangerouslySetInnerHTML={{ __html: commentText }} />
                             </div>
                         </div>
-                    ))}
-
-                </div>
-
+                    );
+                })}
             </div>
         </section>
     );

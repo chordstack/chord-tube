@@ -1,18 +1,13 @@
+// src/App.tsx (optional)
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import routes from "./routes";
 
-import { Route, Routes } from "react-router-dom"
-import Layout from "./layout"
-import Home from "./pages/Home"
-import Detail from "./pages/Detail"
+const router = createBrowserRouter(routes);
 
 function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/:name" element={<Home />} />
-        <Route path="/detail/:id" element={<Detail />} />
-      </Routes>
-    </Layout>
-  )
+    <RouterProvider router={router} />
+  );
 }
 
-export default App
+export default App;

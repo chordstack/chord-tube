@@ -1,20 +1,26 @@
 import * as React from 'react';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { useCategoryIdStore } from '../stores/useVideoStore';
+import { useCategoryIdStore, useSearchStore } from '../stores/useVideoStore';
 import { categoryMap } from '../constants/categoryMap';
 import { useNavigate } from 'react-router-dom';
+import type { SelectChangeEvent } from '@mui/material';
 
 export default function NavBarbuttonGroup() {
   const categoryId = useCategoryIdStore((state) => state.categoryId);
   const setCategoryId = useCategoryIdStore((state) => state.setCategoryId);
+  const setInput = useSearchStore((state) => state.setInput);
+  const submitQuery = useSearchStore((state) => state.submitQuery);
   const name = categoryMap[categoryId];
   const navigate = useNavigate();
 
   const handleChange = (
-    event: React.MouseEvent<HTMLElement>,
+    event: SelectChangeEvent,
     newCategoryId: string,
   ) => {
+    event.preventDefault();
+    setInput('');
+    submitQuery();
     name && navigate(`/${name}`);
 
     if (newCategoryId !== null) {

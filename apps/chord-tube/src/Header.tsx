@@ -11,7 +11,7 @@ import { Button } from "@mui/material";
 const Header = () => {
     return (
         <header className="">
-            <nav className=" flex px-[2%] justify-between items-center mx-auto fixed top-0 left-0 w-full bg-gray-900 py-1 z-[999] ">
+            <nav className=" flex px-[2%] justify-between items-center mx-auto fixed top-0 left-0 w-full bg-gray-950 py-1 z-[999] ">
                 <div className=" flex items-center">
                     <div className=" lg:flex hidden">
                         <Sidebar />

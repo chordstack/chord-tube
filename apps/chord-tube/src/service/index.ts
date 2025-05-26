@@ -191,7 +191,7 @@ export async function getTrendingVideos(
 
 export async function getSearchVideos(
   q: string,
-  pageToken: string
+  pageToken: string = ""
 ): Promise<VideoListResponse> {
   const url = new SearchParamsBuilder()
     .q(q)

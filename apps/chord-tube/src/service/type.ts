@@ -34,6 +34,7 @@ export type VideoListItem = {
   snippet: Snippet;
   contentDetails: ContentDetails;
   statistics: Statistics;
+  items?: VideoListItem[];
 };
 
 export type VideoListResponse = {
@@ -41,6 +42,7 @@ export type VideoListResponse = {
   etag: string;
   items: VideoListItem[];
   pageInfo?: any;
+  pages?: VideoListItem[];
   nextPageToken?: string;
 };
 

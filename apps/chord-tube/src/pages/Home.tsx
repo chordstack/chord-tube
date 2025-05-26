@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { getSearchVideos, getTrendingVideos } from "../service";
-import type { VideoListResponse } from "../service/type";
+import type { VideoListItem, VideoListResponse } from "../service/type";
 import {
     useCategoryIdStore,
     useRegionCodeStore,
@@ -13,6 +12,8 @@ import Card from "../components/card";
 import noData from "../assets/images/nodata.webp";
 import { useNavigate } from "react-router-dom";
 import { categoryMap } from "../constants/categoryMap";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { Loading } from "../components/loading";
 
 const Home = () => {
     const [cols, setCols] = useState(3);
@@ -21,15 +22,25 @@ const Home = () => {
     const q = useSearchStore((state) => state.query);
     const navigate = useNavigate();
 
-    const name = categoryMap[categoryId];
+    // Safe fallback for name if categoryId is invalid
+    const name = categoryMap[categoryId] ?? "home";
+
+    // Debug log if categoryId not found in categoryMap
+    useEffect(() => {
+        if (!categoryMap.hasOwnProperty(categoryId)) {
+            console.warn(
+                `categoryId ${categoryId} not found in categoryMap, falling back to 'home'`
+            );
+        }
+    }, [categoryId]);
 
     useEffect(() => {
-        if (q.length === 0) {
+        if (q.length === 0 && typeof name === "string" && name.trim() !== "") {
             navigate(`/${name}`);
         }
     }, [q, name, navigate]);
 
-    const fetchVideos = async ({ pageParam = "" }) => {
+    const fetchVideos = async ({ pageParam = "" as string }) => {
         if (q.length === 0) {
             return getTrendingVideos(categoryId, regionCode, pageParam);
         } else {
@@ -43,9 +54,9 @@ const Home = () => {
         hasNextPage,
         isFetchingNextPage,
         isLoading,
-    } = useInfiniteQuery<VideoListResponse>({
+    } = useInfiniteQuery<VideoListResponse, Error>({
         queryKey: ["videos", q, categoryId, regionCode],
-        queryFn: fetchVideos,
+        queryFn: () => fetchVideos({ pageParam: "" }),
         initialPageParam: "",
         getNextPageParam: (lastPage) => lastPage.nextPageToken ?? false,
         staleTime: 1000 * 60 * 2,
@@ -57,7 +68,11 @@ const Home = () => {
         const visibleHeight = window.innerHeight;
         const fullHeight = document.body.scrollHeight;
 
-        if (scrollY + visibleHeight >= fullHeight - 200 && hasNextPage && !isFetchingNextPage) {
+        if (
+            scrollY + visibleHeight >= fullHeight - 200 &&
+            hasNextPage &&
+            !isFetchingNextPage
+        ) {
             fetchNextPage();
         }
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
@@ -84,7 +99,7 @@ const Home = () => {
         }
     };
 
-    const videos = data?.pages.flatMap((page) => page?.items) || [];
+    const videos = data?.pages?.flatMap((page) => page.items ?? []) || [];
 
     return (
         <>
@@ -94,15 +109,13 @@ const Home = () => {
             </div>
 
             {isLoading ? (
-                <div className="w-full flex justify-center items-center mt-10 text-lg font-semibold">
-                    Loading...
-                </div>
+                <Loading />
             ) : videos.length > 0 ? (
                 <>
                     <div
                         className={`grid ${getGridCols()} md:gap-x-4 md:gap-y-6 gap-x-3 gap-y-5 mt-5 w-full`}
                     >
-                        {videos.map((video, idx) => (
+                        {videos.map((video: VideoListItem, idx: number) => (
                             <Card key={idx} idx={idx} video={video} />
                         ))}
                     </div>
@@ -115,7 +128,7 @@ const Home = () => {
                 </>
             ) : (
                 <figure className="w-full mt-10 flex justify-center caret-transparent items-center">
-                    <img src={noData} className=" max-w-[50%] " alt="No results" />
+                    <img src={noData} className="max-w-[50%]" alt="No results" />
                 </figure>
             )}
         </>

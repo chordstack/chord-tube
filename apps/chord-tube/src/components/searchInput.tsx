@@ -2,16 +2,20 @@
 import { InputBase, Paper, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useSearchStore } from '../stores/useVideoStore';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
     onSubmit?: () => void;
 }
 
 export default function SearchInput({ onSubmit }: Props) {
+
+    const navigate = useNavigate();
     const { input, setInput, submitQuery } = useSearchStore();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        navigate(`/`);
         submitQuery();
         onSubmit?.();
     };

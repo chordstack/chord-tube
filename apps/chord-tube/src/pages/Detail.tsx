@@ -1,20 +1,23 @@
-import { use, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { getVideoDetail, getChannelDetail } from "../service";
 import DetailCard from "../components/detailCard";
 import type { ContentDetails } from "../service/type";
 import SuggestedVdSection from "../components/suggestedVdSection";
-import { useCategoryIdStore } from "../stores/useVideoStore";
 
 const Detail = () => {
-    const { id } = useParams();
+    const { id }: string | any = useParams();
     const [video, setVideo] = useState<ContentDetails>(null);
     const [channel, setChannel] = useState<ContentDetails>(null);
 
     useEffect(() => {
         if (!id) return;
+        // Scroll to top when video ID changes
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
         fetchDetail();
     }, [id]);
+
     const fetchDetail = async () => {
         try {
             const data = await getVideoDetail(id);
@@ -29,12 +32,10 @@ const Detail = () => {
         }
     };
 
-
-
     return (
         <div className="md:grid-cols-4 grid-cols-1 grid gap-4 mt-5">
             <DetailCard video={video} channel={channel} id={id} />
-            <SuggestedVdSection cateId={video?.snippet.categoryId} id={id} />
+            <SuggestedVdSection id={id} />
         </div>
     );
 };

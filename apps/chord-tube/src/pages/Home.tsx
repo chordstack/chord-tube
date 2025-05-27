@@ -11,7 +11,7 @@ import RegionButtonGroup from "../components/RegionButtonGroup";
 import Card from "../components/card";
 import noData from "../assets/images/nodata.webp";
 import { useNavigate } from "react-router-dom";
-import { categoryMap } from "../constants/categoryMap";
+import { categoryMap, regions } from "../constants/categoryMap";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loading } from "../components/loading";
 
@@ -19,33 +19,32 @@ const Home = () => {
     const [cols, setCols] = useState(3);
     const categoryId = useCategoryIdStore((state) => state.categoryId);
     const regionCode = useRegionCodeStore((state) => state.regionCode);
-    const q = useSearchStore((state) => state.query);
+    const query = useSearchStore((state) => state.query) ?? ""; // fallback to empty string
     const navigate = useNavigate();
 
-    // Safe fallback for name if categoryId is invalid
-    const name = categoryMap[categoryId] ?? "home";
+    const categoryName = categoryMap[categoryId] ?? "home";
+    const isSearchMode = query.trim().length > 0;
 
-    // Debug log if categoryId not found in categoryMap
+
+    // Warn if categoryId not in map
     useEffect(() => {
         if (!categoryMap.hasOwnProperty(categoryId)) {
-            console.warn(
-                `categoryId ${categoryId} not found in categoryMap, falling back to 'home'`
-            );
+            console.warn(`categoryId ${categoryId} not found. Using 'home' as fallback.`);
         }
     }, [categoryId]);
 
+    // Redirect if no search query (not in search mode)
     useEffect(() => {
-        if (q.length === 0 && typeof name === "string" && name.trim() !== "") {
-            navigate(`/${name}`);
+        if (!isSearchMode && categoryName) {
+            navigate(`/${categoryName}`);
         }
-    }, [q, name, navigate]);
+    }, [isSearchMode, categoryName, navigate]);
 
-    const fetchVideos = async ({ pageParam = "" as string }) => {
-        if (q.length === 0) {
-            return getTrendingVideos(categoryId, regionCode, pageParam);
-        } else {
-            return getSearchVideos(q, pageParam);
-        }
+    // Fetch videos based on mode
+    const fetchVideos = async ({ pageParam = "" }: { pageParam?: string }) => {
+        return isSearchMode
+            ? getSearchVideos(query, pageParam)
+            : getTrendingVideos(categoryId, regionCode, pageParam);
     };
 
     const {
@@ -55,15 +54,18 @@ const Home = () => {
         isFetchingNextPage,
         isLoading,
     } = useInfiniteQuery<VideoListResponse, Error>({
-        queryKey: ["videos", q, categoryId, regionCode],
-        queryFn: () => fetchVideos({ pageParam: "" }),
+        queryKey: ["videos", query, categoryId, regionCode],
+        queryFn: ({ pageParam }) => fetchVideos({ pageParam }),
         initialPageParam: "",
-        getNextPageParam: (lastPage) => lastPage.nextPageToken ?? false,
+        getNextPageParam: (lastPage) =>
+            isSearchMode && lastPage?.nextPageToken ? lastPage.nextPageToken : false,
         staleTime: 1000 * 60 * 2,
     });
 
-    // Custom scroll listener
+    // Infinite scroll handler only in search mode
     const handleScroll = useCallback(() => {
+        if (!isSearchMode) return;
+
         const scrollY = window.scrollY;
         const visibleHeight = window.innerHeight;
         const fullHeight = document.body.scrollHeight;
@@ -75,13 +77,14 @@ const Home = () => {
         ) {
             fetchNextPage();
         }
-    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage, isSearchMode]);
 
     useEffect(() => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, [handleScroll]);
 
+    // Helper to convert number of cols to Tailwind grid class
     const getGridCols = () => {
         switch (cols) {
             case 1:
@@ -99,14 +102,40 @@ const Home = () => {
         }
     };
 
-    const videos = data?.pages?.flatMap((page) => page.items ?? []) || [];
+    const videos = data?.pages.flatMap((page) => page.items ?? []) || [];
+
+    const currentRegion = regions.find((r) => r.code === regionCode);
+
+    const regionNameMap: Record<string, string> = {
+        US: "United States",
+        GB: "United Kingdom",
+        SG: "Singapore",
+        JP: "Japan",
+        TH: "Thailand",
+        KR: "South Korea",
+    };
+
+    const regionName = regionNameMap[regionCode]
 
     return (
         <>
-            <div className="flex gap-5 justify-between md:items-center items-start">
+            <div className="flex gap-5 md:mt-4 justify-between md:items-center items-start">
                 <RegionButtonGroup />
                 <ColumnSwitcher onChange={(cols) => setCols(cols)} />
             </div>
+
+            {!isSearchMode && currentRegion && (
+                <div className="lg:text-4xl md:text-3xl text-2xl mt-4 font-semibold md:mb-8 mb-6 flex w-full justify-center items-center gap-2">
+                    <span>Trending Videos at</span>
+                    <span className=" md:block hidden">{regionName}</span>
+                    <span className=" md:hidden block">{currentRegion.label}</span>
+                    <img
+                        src={currentRegion.flag}
+                        alt={currentRegion.label}
+                        className="md:w-14 w-10 ml-1 object-cover rounded-sm mt-1"
+                    />
+                </div>
+            )}
 
             {isLoading ? (
                 <Loading />
@@ -116,7 +145,13 @@ const Home = () => {
                         className={`grid ${getGridCols()} md:gap-x-4 md:gap-y-6 gap-x-3 gap-y-5 mt-5 w-full`}
                     >
                         {videos.map((video: VideoListItem, idx: number) => (
-                            <Card key={idx} idx={idx} video={video} />
+                            <Card
+                                key={idx}
+                                idx={idx}
+                                video={video}
+                                badgeNumber={!isSearchMode && idx < 10 ? idx + 1 : undefined}
+                                isSearchMode={isSearchMode}
+                            />
                         ))}
                     </div>
 
@@ -127,7 +162,7 @@ const Home = () => {
                     )}
                 </>
             ) : (
-                <figure className="w-full mt-10 flex justify-center caret-transparent items-center">
+                <figure className="w-full mt-10 flex justify-center items-center caret-transparent">
                     <img src={noData} className="max-w-[50%]" alt="No results" />
                 </figure>
             )}

@@ -10,14 +10,9 @@ import {
     Box,
     type SelectChangeEvent,
 } from '@mui/material';
+import { regions } from '../constants/categoryMap';
 
-const regions = [
-    { code: 'GB', label: 'UK', flag: 'https://flagcdn.com/gb.svg' },
-    { code: 'US', label: 'US', flag: 'https://flagcdn.com/us.svg' },
-    { code: 'JP', label: 'JP', flag: 'https://flagcdn.com/jp.svg' },
-    { code: 'KR', label: 'KR', flag: 'https://flagcdn.com/kr.svg' },
-    { code: 'SG', label: 'SG', flag: 'https://flagcdn.com/sg.svg' },
-];
+
 
 export default function RegionButtonGroup() {
     const regionCode = useRegionCodeStore((state) => state.regionCode);
@@ -86,7 +81,7 @@ export default function RegionButtonGroup() {
                     <img
                         src={flag}
                         alt={label}
-                        className="w-5 h-5 object-cover rounded-sm"
+                        className="w-8 h-5 object-cover rounded-sm"
                     />
                     <span>{label}</span>
                 </ToggleButton>

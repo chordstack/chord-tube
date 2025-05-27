@@ -11,11 +11,16 @@ import {
 } from "@mui/icons-material";
 import { useSearchStore } from "../stores/useVideoStore";
 import { CommentSection } from "./commentSection";
-import { viewConverter } from "../service";
+import { viewConverter } from "../constants/categoryMap";
+import moment from "moment";
+
+
+
 
 const DetailCard = ({ video, channel, id }: any) => {
     const setQuery = useSearchStore((state) => state.setInput);
     const submitQuery = useSearchStore((state) => state.submitQuery);
+    const formattedDate = moment(video?.snippet?.publishedAt).fromNow();
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -91,7 +96,9 @@ const DetailCard = ({ video, channel, id }: any) => {
                                         {channel?.snippet?.title}
                                     </h2>
                                     <p className="text-sm text-gray-400">
-                                        {viewConverter(channel?.statistics?.subscriberCount)} subscribers
+                                        {channel?.statistics?.subscriberCount
+                                            ? `${viewConverter(channel.statistics.subscriberCount)} subscribers`
+                                            : null}
                                     </p>
                                 </div>
                             </div>
@@ -104,7 +111,9 @@ const DetailCard = ({ video, channel, id }: any) => {
                             <Button variant="text">
                                 <ThumbUpAlt />
                                 <span className="ml-1">
-                                    {viewConverter(video?.statistics?.likeCount)}
+                                    {video?.statistics?.likeCount
+                                        ? viewConverter(video.statistics.likeCount)
+                                        : null}
                                 </span>
                             </Button>
                             <Divider orientation="vertical" className="bg-gray-600 mx-1" />
@@ -127,8 +136,10 @@ const DetailCard = ({ video, channel, id }: any) => {
 
             <div className="mt-2 text-md text-gray-100 font-medium">
                 <p>
-                    <span>{viewConverter(video?.statistics?.viewCount)} views</span>
-                    <span className="ml-2">{video?.snippet?.publishedAt}</span>
+                    <span>{video?.statistics?.viewCount
+                        ? viewConverter(video.statistics.viewCount)
+                        : null} views</span>
+                    <span className="ml-2">{formattedDate}</span>
 
                     {video?.snippet?.tags?.slice(0, 6).map((tag: string, idx: number) => (
                         <button

@@ -22,7 +22,7 @@ class TrendingParamsBuilder {
     chart: "mostPopular",
     part: [...defaultParts],
     maxResults: 100,
-    regionCode: "GB",
+    regionCode: "MM",
     key: null,
   };
 
@@ -222,16 +222,6 @@ export async function getChannelDetail(id: string): Promise<any> {
   const { data } = await axios.get(url.toString());
   return data;
 }
-
-export const viewConverter = (value: number) => {
-  if (value >= 1_000_000) {
-    return (value / 1_000_000).toFixed(1) + "M";
-  } else if (value >= 1_000) {
-    return (value / 1_000).toFixed(1) + "K";
-  } else {
-    return value;
-  }
-};
 
 export const getVideoComments = async (videoId: string, order: string) => {
   const { data } = await axios.get(`${config.BASE_URL}/commentThreads`, {

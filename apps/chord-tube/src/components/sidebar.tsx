@@ -23,19 +23,27 @@ import { useCategoryIdStore, useSearchStore } from '../stores/useVideoStore';
 import logo from '../assets/images/logo.webp';
 import { categoryMap } from '../constants/categoryMap';
 import { useNavigate } from 'react-router-dom';
-
+import { Build, CardTravel, EmojiEmotions, MovieCreation, Pets, School, VolunteerActivism } from '@mui/icons-material';
 
 const menu = [
     { id: 1, name: 'Home', categoryID: 0, icon: <HomeOutlinedIcon /> },
-    { id: 2, name: 'Gaming', categoryID: 20, icon: <SportsEsportsIcon /> },
-    { id: 3, name: 'Automobiles', categoryID: 2, icon: <DirectionsCarIcon /> },
-    { id: 4, name: 'Sports', categoryID: 17, icon: <SportsBaseballIcon /> },
+    { id: 2, name: 'Cars & Vehicles', categoryID: 2, icon: <DirectionsCarIcon /> },
+    { id: 3, name: 'Comedy', categoryID: 23, icon: <EmojiEmotions /> },
+    { id: 4, name: 'Education', categoryID: 27, icon: <School /> },
     { id: 5, name: 'Entertainment', categoryID: 24, icon: <TvIcon /> },
-    { id: 6, name: 'Technology', categoryID: 28, icon: <MemoryIcon /> },
-    { id: 7, name: 'Music', categoryID: 10, icon: <MusicNoteIcon /> },
-    { id: 8, name: 'Blogs', categoryID: 22, icon: <RssFeedIcon /> },
-    { id: 9, name: 'News', categoryID: 25, icon: <NewspaperIcon /> }
+    { id: 6, name: 'Film & Animation', categoryID: 1, icon: <MovieCreation /> },
+    { id: 7, name: 'Gaming', categoryID: 20, icon: <SportsEsportsIcon /> },
+    { id: 8, name: 'How-to & Style', categoryID: 26, icon: <Build /> },
+    { id: 9, name: 'Music', categoryID: 10, icon: <MusicNoteIcon /> },
+    { id: 10, name: 'News & Politics', categoryID: 25, icon: <NewspaperIcon /> },
+    { id: 11, name: 'Non-profits & Activism', categoryID: 29, icon: <VolunteerActivism /> },
+    { id: 12, name: 'People & Blogs', categoryID: 22, icon: <RssFeedIcon /> },
+    { id: 13, name: 'Pets & Animals', categoryID: 15, icon: <Pets /> },
+    { id: 14, name: 'Science & Technology', categoryID: 28, icon: <MemoryIcon /> },
+    { id: 15, name: 'Sports', categoryID: 17, icon: <SportsBaseballIcon /> },
+    { id: 16, name: 'Travel & Events', categoryID: 19, icon: <CardTravel /> }
 ];
+
 
 export default function Sidebar() {
     const [open, setOpen] = useState(false);

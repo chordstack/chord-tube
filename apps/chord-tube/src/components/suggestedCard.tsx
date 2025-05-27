@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom"
-import { viewConverter } from "../service"
+
 import moment from "moment"
 import { Circle } from "@mui/icons-material"
 import type { VideoListItem } from "../service/type"
+import { viewConverter } from "../constants/categoryMap"
 
 
 export const SuggestedCard = ({ video }: { video: VideoListItem }) => {

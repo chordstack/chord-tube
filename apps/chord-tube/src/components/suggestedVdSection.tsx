@@ -11,23 +11,24 @@ export default function SuggestedVdSection({ id }: { id: string | undefined }) {
     const q = useSearchStore((state) => state.query);
     const loader = useRef<HTMLDivElement | null>(null);
 
-  const fetchVideos: QueryFunction<VideoListResponse, ["suggestedVideos", string, number, string], string> = async ({ pageParam = "" }) => {
-    return q.length === 0
-        ? await getTrendingVideos(categoryId, regionCode, pageParam)
-        : await getSearchVideos(q, pageParam);
-};
+    const fetchVideos: QueryFunction<VideoListResponse, ["suggestedVideos", string, number, string], string> = async ({ pageParam = "" }) => {
+        return q.length === 0
+            ? await getTrendingVideos(categoryId, regionCode, pageParam)
+            : await getSearchVideos(q, pageParam);
+    };
 
-   const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-} = useInfiniteQuery<VideoListResponse, Error, VideoListResponse, ["suggestedVideos", string, number, string],string>({
-    queryKey: ["suggestedVideos", q, categoryId, regionCode],
-    queryFn: fetchVideos,
-    getNextPageParam: (lastPage) => lastPage?.nextPageToken ?? undefined,
-    staleTime: 1000 * 60 * 5,
-});
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useInfiniteQuery<VideoListResponse, Error, VideoListResponse, ["suggestedVideos", string, number, string], string>({
+        queryKey: ["suggestedVideos", q, categoryId, regionCode],
+        queryFn: fetchVideos,
+        getNextPageParam: (lastPage) => lastPage?.nextPageToken ?? undefined,
+        initialPageParam: "0",
+        staleTime: 1000 * 60 * 5,
+    });
 
     useEffect(() => {
         const observer = new IntersectionObserver(entries => {
@@ -46,7 +47,7 @@ export default function SuggestedVdSection({ id }: { id: string | undefined }) {
 
     return (
         <div className="lg:mt-0 mt-5 w-full lg:col-span-1 col-span-1 flex flex-col gap-4 relative">
-            {data?.pages.map((page, pageIndex) =>
+            {data?.pages?.map((page, pageIndex) =>
                 page.items?.map((video: VideoListItem, idx: number) => {
                     const videoId = typeof video.id === "string" ? video.id : video.id?.videoId;
                     return videoId === id ? null : (

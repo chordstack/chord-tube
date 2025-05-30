@@ -26,7 +26,7 @@ export default function SuggestedVdSection({ id }: { id: string | undefined }) {
         queryKey: ["suggestedVideos", q, categoryId, regionCode],
         queryFn: fetchVideos,
         getNextPageParam: (lastPage) => lastPage?.nextPageToken ?? undefined,
-        initialPageParam: "0",
+        initialPageParam: "",
         staleTime: 1000 * 60 * 5,
     });
 

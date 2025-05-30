@@ -12,7 +12,7 @@ type TrendingVideoParams = {
   part: PartType[];
   maxResults: number;
   regionCode: string;
-  videoCategoryId?: number | string;
+  videoCategoryId?: number | null;
   key: string | null;
   pageToken?: string | null;
 };
@@ -46,7 +46,7 @@ class TrendingParamsBuilder {
     return this;
   }
 
-  videoCategoryId(value: number | string) {
+  videoCategoryId(value: number ) {
     if (value !== 0) {
       this._params.videoCategoryId = value;
     }

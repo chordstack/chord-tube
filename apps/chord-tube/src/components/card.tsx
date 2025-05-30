@@ -37,11 +37,11 @@ export default function Card({ video, idx, badgeNumber, isSearchMode }: CardProp
             <h1 className="line-clamp-2 md:text-lg font-medium leading-tight">
                 {video.snippet.title}
             </h1>
-            <div className="flex justify-between items-center text-xs text-gray-300">
-                <p className="font-medium md:text-md text-sm text-gray-200">
+            <div className="grid grid-cols-2 justify-between text-xs text-gray-300">
+                <p className="font-medium line-clamp-1 md:text-md text-sm text-gray-200">
                     {video.snippet.channelTitle}
                 </p>
-                <p>{!isSearchMode && <> <span>{viewConverter(video.statistics.viewCount)} views</span>  <span className="ml-1 mr-2">|</span></>}<span>{formattedDate}</span></p>
+                <p className=" w-[300px] mt-1">{!isSearchMode && <> <span>{viewConverter(video.statistics.viewCount)} views</span>  <span className="ml-1 mr-2">|</span></>}<span>{formattedDate}</span></p>
             </div>
         </Link>
     );

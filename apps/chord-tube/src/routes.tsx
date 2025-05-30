@@ -12,24 +12,28 @@ const withSuspense = (component: ReactNode) => (
 );
 
 const routes: RouteObject[] = [
-    {
-        path: "/",
-        element: <Layout />,
-        children: [
-            {
-                index: true,
-                element: withSuspense(<Home />),
-            },
-            {
-                path: ":name",
-                element: withSuspense(<Home />),
-            },
-            {
-                path: "detail/:id",
-                element: withSuspense(<Detail />),
-            },
-        ],
-    },
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: withSuspense(<Home />),
+      },
+      {
+        path: ":name",
+        element: withSuspense(<Home />),
+      },
+      {
+        path: "search",
+        element: withSuspense(<Home />),
+      },
+      {
+        path: "detail/:id",
+        element: withSuspense(<Detail />),
+      },
+    ],
+  },
 ];
 
 export default routes;

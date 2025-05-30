@@ -4,7 +4,6 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useCategoryIdStore, useSearchStore } from '../stores/useVideoStore';
 import { categoryMap } from '../constants/categoryMap';
 import { useNavigate } from 'react-router-dom';
-import type { SelectChangeEvent } from '@mui/material';
 
 export default function NavBarbuttonGroup() {
   const categoryId = useCategoryIdStore((state) => state.categoryId);
@@ -15,7 +14,7 @@ export default function NavBarbuttonGroup() {
   const navigate = useNavigate();
 
   const handleChange = (
-    event: SelectChangeEvent,
+    event: React.MouseEvent<HTMLElement>,
     newCategoryId: string,
   ) => {
     event.preventDefault();
@@ -46,7 +45,7 @@ export default function NavBarbuttonGroup() {
         <ToggleButton
           key={value}
           value={value}
-          className={`!text-white ${String(categoryId) === value ? 'bg-gray-700' : ''}`}
+          className={`!text-white ${String(categoryId) === value ? 'bg-gray-300' : ''}`}
         >
           {label}
         </ToggleButton>

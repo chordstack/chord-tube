@@ -1,8 +1,9 @@
 import { useRef, useEffect } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, type QueryFunction } from "@tanstack/react-query";
 import { getSearchVideos, getTrendingVideos } from "../service";
 import { useCategoryIdStore, useRegionCodeStore, useSearchStore } from "../stores/useVideoStore";
 import { SuggestedCard } from "./suggestedCard";
+import type { VideoListResponse, VideoListItem } from "../service/type";
 
 export default function SuggestedVdSection({ id }: { id: string | undefined }) {
     const categoryId = useCategoryIdStore((state) => state.categoryId);
@@ -10,26 +11,24 @@ export default function SuggestedVdSection({ id }: { id: string | undefined }) {
     const q = useSearchStore((state) => state.query);
     const loader = useRef<HTMLDivElement | null>(null);
 
-    const fetchVideos = async ({ pageParam = "" }) => {
-        const data = q.length === 0
-            ? await getTrendingVideos(categoryId, regionCode, pageParam)
-            : await getSearchVideos(q, pageParam);
-        return data;
-    };
+  const fetchVideos: QueryFunction<VideoListResponse, ["suggestedVideos", string, number, string], string> = async ({ pageParam = "" }) => {
+    return q.length === 0
+        ? await getTrendingVideos(categoryId, regionCode, pageParam)
+        : await getSearchVideos(q, pageParam);
+};
 
-    const {
-        data,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useInfiniteQuery({
-        queryKey: ["suggestedVideos", q, categoryId, regionCode],
-        queryFn: fetchVideos,
-        getNextPageParam: (lastPage) => lastPage?.nextPageToken ?? false,
-        staleTime: 1000 * 60 * 5, // 5 minutes
-    });
+   const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+} = useInfiniteQuery<VideoListResponse, Error, VideoListResponse, ["suggestedVideos", string, number, string],string>({
+    queryKey: ["suggestedVideos", q, categoryId, regionCode],
+    queryFn: fetchVideos,
+    getNextPageParam: (lastPage) => lastPage?.nextPageToken ?? undefined,
+    staleTime: 1000 * 60 * 5,
+});
 
-    // Intersection Observer for infinite scroll
     useEffect(() => {
         const observer = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
@@ -37,25 +36,23 @@ export default function SuggestedVdSection({ id }: { id: string | undefined }) {
             }
         }, { threshold: 1.0 });
 
-        if (loader.current) {
-            observer.observe(loader.current);
-        }
+        const currentLoader = loader.current;
+        if (currentLoader) observer.observe(currentLoader);
 
         return () => {
-            if (loader.current) {
-                observer.unobserve(loader.current);
-            }
+            if (currentLoader) observer.unobserve(currentLoader);
         };
-    }, [hasNextPage, isFetchingNextPage]);
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     return (
-        <div className="py-5 w-full flex flex-col gap-4 relative">
+        <div className="lg:mt-0 mt-5 w-full lg:col-span-1 col-span-1 flex flex-col gap-4 relative">
             {data?.pages.map((page, pageIndex) =>
-                page.items.map((video: any, idx: number) =>
-                    video.id === id ? null : (
+                page.items?.map((video: VideoListItem, idx: number) => {
+                    const videoId = typeof video.id === "string" ? video.id : video.id?.videoId;
+                    return videoId === id ? null : (
                         <SuggestedCard key={`${pageIndex}-${idx}`} video={video} />
-                    )
-                )
+                    );
+                })
             )}
             <div ref={loader} className="h-10" />
             {isFetchingNextPage && <p className="text-center text-sm text-gray-400">Loading more...</p>}

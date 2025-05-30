@@ -7,7 +7,8 @@ export const Loading = () => {
             flexDirection="column"
             alignItems="center"
             justifyContent="center"
-            minHeight="100vh"
+            minHeight="80vh"
+            width={"100%"}
         >
             <CircularProgress color="primary" size={60} />
             <Typography variant="h6" mt={2}>

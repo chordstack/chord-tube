@@ -12,9 +12,7 @@ const Detail = () => {
 
     useEffect(() => {
         if (!id) return;
-        // Scroll to top when video ID changes
         window.scrollTo({ top: 0, behavior: "smooth" });
-
         fetchDetail();
     }, [id]);
 
@@ -33,7 +31,7 @@ const Detail = () => {
     };
 
     return (
-        <div className="md:grid-cols-4 grid-cols-1 grid gap-4 mt-5">
+        <div className="lg:grid-cols-3 grid-cols-1 grid lg:gap-4 gap-2">
             <DetailCard video={video} channel={channel} id={id} />
             <SuggestedVdSection id={id} />
         </div>

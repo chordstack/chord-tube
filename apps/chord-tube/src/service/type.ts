@@ -43,7 +43,8 @@ export type VideoListResponse = {
   items: VideoListItem[];
   pageInfo?: any;
   pages?: VideoListItem[];
-  nextPageToken?: string;
+  nextPageToken?: string | null;
+
 };
 
 export type SidebarItem = {

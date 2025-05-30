@@ -8,8 +8,7 @@ export default function SubscribeButton() {
 
     return subscribed ? (
         <Button
-            variant="outlined"
-            color="success"
+            variant="text"
             startIcon={<CheckIcon />}
             onClick={() => setSubscribed(false)}
             sx={{
@@ -18,9 +17,7 @@ export default function SubscribeButton() {
                 paddingY: 0.5,
                 fontWeight: "semibold",
                 borderColor: "#16a34a",
-                "&:hover": {
-                    backgroundColor: "#dcfce7",
-                },
+                
             }}
         >
             Subscribed

@@ -23,7 +23,7 @@ export default function SuggestedVdSection({ id }: { id: string | undefined }) {
         hasNextPage,
         isFetchingNextPage,
     } = useInfiniteQuery<VideoListResponse, Error, VideoListResponse, ["suggestedVideos", string, number, string], string>({
-        queryKey: ["suggestedVideos", q, categoryId, regionCode],
+        queryKey: ["suggestedVideos", q, categoryId, regionCode ],
         queryFn: fetchVideos,
         getNextPageParam: (lastPage) => lastPage?.nextPageToken ?? undefined,
         initialPageParam: "",
